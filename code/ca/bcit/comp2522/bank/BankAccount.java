@@ -5,6 +5,7 @@ package ca.bcit.comp2522.bank;
  *
  * @author Abhia Salman
  * @author Evelyn Millman
+ * @author Jaden McDonald
  *
  * @version 1.0
  */
