@@ -38,11 +38,27 @@ public class BankAccount
      * @throws IllegalArgumentException if account information is invalid
      */
     public BankAccount(final BankClient client,
-                       final double balanceUsd,
-                       final int pin,
-                       final String accountNumber,
-                       final Date accountOpened,
-                       final Date accountClosed)
+                       final double     balanceUsd,
+                       final int        pin,
+                       final String     accountNumber,
+                       final Date       accountOpened,
+                       final Date       accountClosed)
+    {
+
+        this.client        = validateClient(client);
+        this.balanceUsd    = validateBalanceUsd(balanceUsd);
+        this.pin           = pin;
+        this.accountNumber = validateAccountNumber(accountNumber);
+        this.accountOpened = validateAccountOpened(accountOpened);
+        this.accountClosed = accountClosed;
+    }
+
+    /**
+     * Validate Bank client.
+     * @param client client to validate
+     * @return       client if valid
+     */
+    private static BankClient validateClient(final BankClient client)
     {
         if (client == null)
         {
@@ -50,12 +66,35 @@ public class BankAccount
                     "Client cannot be null.");
         }
 
-        if (balanceUsd < 0)
+        return client;
+    }
+
+    /**
+     * Validate balance in USD.
+     * @param balanceUsd balanceUsd to validate
+     * @return           balanceUsd if valid
+     */
+    private static double validateBalanceUsd(final double balanceUsd)
+    {
+        final int zeroBalance;
+        zeroBalance = 0;
+
+        if (balanceUsd < zeroBalance)
         {
             throw new IllegalArgumentException(
                     "Balance cannot be negative.");
         }
 
+        return balanceUsd;
+    }
+
+    /**
+     * Validate account number.
+     * @param accountNumber account number to validate
+     * @return           account number if valid
+     */
+    private static String validateAccountNumber(final String accountNumber)
+    {
         if (accountNumber == null)
         {
             throw new IllegalArgumentException(
@@ -70,18 +109,18 @@ public class BankAccount
                             "or {@link #MAX_ACCOUNT_NUMBER_LENGTH} characters.");
         }
 
+        return accountNumber;
+    }
+
+    private static Date validateAccountOpened(final Date accountOpened)
+    {
         if (accountOpened == null)
         {
             throw new IllegalArgumentException(
                     "Account opening date cannot be null.");
         }
 
-        this.client = client;
-        this.balanceUsd = balanceUsd;
-        this.pin = pin;
-        this.accountNumber = accountNumber;
-        this.accountOpened = accountOpened;
-        this.accountClosed = accountClosed;
+        return accountOpened;
     }
 
     /**
