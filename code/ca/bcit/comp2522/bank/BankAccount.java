@@ -13,11 +13,11 @@ public class BankAccount
     private static final int MAX_ACCOUNT_NUMBER_LENGTH;
 
     private final BankClient client;
-    private double balanceUsd;
-    private final int pin;
-    private final String accountNumber;
-    private final Date accountOpened;
-    private final Date accountClosed;
+    private double          balanceUsd;
+    private final int       pin;
+    private final String    accountNumber;
+    private final Date      accountOpened;
+    private final Date      accountClosed;
 
     static
     {
