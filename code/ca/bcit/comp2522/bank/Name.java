@@ -1,93 +1,79 @@
 package ca.bcit.comp2522.bank;
 
 /**
- * Represents a name class.
+ * Represents a person's first and last name.
  *
  * @author Abhia Salman
  * @author Evelyn Millman
- *
  * @version 1.0
  */
 public class Name
 {
-
-    private static final int MAX_LENGTH   = 600;
-    private static final String FORBIDDEN = "jason";
+    private static final int MAX_NAME_LENGTH;
 
     private final String first;
     private final String last;
-    private final String originalFirst;
-    private final String originalLast;
+
+    static
+    {
+        MAX_NAME_LENGTH = 100;
+    }
 
     /**
-     * Constructor.
-    *
-    * @param first first name
-    * 
-    * @param last last name
-    * 
-    * @throws IllegalArgumentException if either name is invalid
+     * Constructs a Name with a first and last name.
+     *
+     * @param first the person's first name
+     * @param last  the person's last name
+     *
+     * @throws IllegalArgumentException if either name is null, blank,
+     *                                  too long, or contains "admin"
      */
     public Name(final String first,
                 final String last)
     {
-        validateClientName(first);
-        validateClientName(last);
+        validateName(first);
+        validateName(last);
 
-        this.originalFirst = first;
-        this.originalLast = last;
-        this.first = format(first);
-        this.last = format(last);
+        this.first = first;
+        this.last  = last;
     }
 
     /**
-     * Validate first and last name.
-    *
-     * @param name name to validate
-     */
-    private static void validateClientName(final String name)
-    {
-        if (name == null ||
-                name.trim().isEmpty())
-        {
-            throw new IllegalArgumentException("Name cannot be null or blank.");
-        }
-
-        if (name.length() >= MAX_LENGTH)
-        {
-            throw new IllegalArgumentException("Name too long.");
-        }
-
-        if (name.toLowerCase().contains(FORBIDDEN))
-        {
-            throw new IllegalArgumentException("Name cannot contain '" + FORBIDDEN + "'.");
-        }
-    }
-
-    /**
-     * Formats the name into initials.
-    *
-     * @param name name to format
-     * 
-     * @return formatted name
-     */
-    private String format(final String name)
-    {
-        final String lower;
-        final char firstLetter;
-
-        lower = name.toLowerCase();
-
-        firstLetter = Character.toUpperCase(lower.charAt(0));
-
-        return firstLetter +
-                lower.substring(1);
-    }
-
-    /**
-     * Get first.
+     * Validates one part of a person's name.
      *
-     * @return first
+     * @param name the name to validate
+     *
+     * @throws IllegalArgumentException if the name is invalid
+     */
+    private static void validateName(final String name)
+    {
+        if (name == null)
+        {
+            throw new IllegalArgumentException("Name cannot be null.");
+        }
+
+        if (name.isBlank())
+        {
+            throw new IllegalArgumentException("Name cannot be blank.");
+        }
+
+        if (name.length() > MAX_NAME_LENGTH)
+        {
+            throw new IllegalArgumentException(
+                    "Name cannot be more than {@link #MAX_NAME_LENGTH} characters.");
+        }
+
+        if (name.toLowerCase().contains("admin"))
+        {
+            throw new IllegalArgumentException(
+                    "Name cannot contain admin.");
+        }
+    }
+
+    /**
+     * Returns the first name.
+     *
+     * @return the first name
      */
     public String getFirst()
     {
@@ -95,9 +81,9 @@ public class Name
     }
 
     /**
-     * Get last.
+     * Returns the last name.
      *
-     * @return last name
+     * @return the last name
      */
     public String getLast()
     {
@@ -105,44 +91,55 @@ public class Name
     }
 
     /**
-     * Gets the initials.
-    *
+     * Returns the person's initials in uppercase.
+     *
      * @return the initials
      */
     public String getInitials()
     {
-        return first.charAt(0) +
-            "."                +
-            last.charAt(0)     +
-            ".";
+        return first.substring(0, 1).toUpperCase() +
+                "." +
+                last.substring(0, 1).toUpperCase() +
+                ".";
     }
 
     /**
-     * Get full name.
-     * @return full name
+     * Returns the person's properly formatted full name.
+     *
+     * @return the full name
      */
     public String getFullName()
     {
-        return first +
-            " "      +
-            last;
+        return formatName(first) + " " + formatName(last);
     }
 
     /**
-     * Get reversed name.
-     * 
-     * @return reversed name
+     * Formats one name so that its first character is uppercase and
+     * its remaining characters are lowercase.
+     *
+     * @param name the name to format
+     *
+     * @return the formatted name
+     */
+    private static String formatName(final String name)
+    {
+        return name.substring(0, 1).toUpperCase() +
+                name.substring(1).toLowerCase();
+    }
+
+    /**
+     * Returns the original first and last names completely reversed.
+     *
+     * @return the reversed name
      */
     public String getReverseName()
     {
-        final String reversedLast;
-        final String reversedFirst;
+        final String fullName;
+        final StringBuilder reversedName;
 
-        reversedLast = new StringBuilder(originalLast).reverse().toString();
-        reversedFirst = new StringBuilder(originalFirst).reverse().toString();
+        fullName = first + " " + last;
+        reversedName = new StringBuilder(fullName);
 
-        return reversedLast +
-            " "             +
-            reversedFirst;
+        return reversedName.reverse().toString();
     }
 }

@@ -1,76 +1,98 @@
 package ca.bcit.comp2522.bank;
 
 /**
- * Represents a bank client class.
+ * Represents a client of the bank.
  *
  * @author Abhia Salman
  * @author Evelyn Millman
- *
  * @version 1.0
  */
-public class BankClient 
+public class BankClient
 {
-
-    private static final int MIN_ID_LENGTH = 6;
-    private static final int MAX_ID_LENGTH = 7;
+    private static final int MIN_ID_LENGTH;
+    private static final int MAX_ID_LENGTH;
 
     private final Name   name;
     private final Date   birthDate;
     private final Date   deathDate;
     private final Date   signupDate;
-    private final String clientId;
+    private final String clientID;
 
-    /**
-     * Bank client constructor.
-     *
-     * @param name       client name
-     * @param birthDate  birthdate
-     * @param deathDate  deathdate
-     * @param signupDate sign up date
-     * @param clientId   client ID
-     * 
-    * @throws IllegalArgumentException if a required value or client ID is invalid
-     */
-    public BankClient(final Name   name,
-                      final Date   birthDate,
-                      final Date   deathDate,
-                      final Date   signupDate,
-                      final String clientId)
+    static
     {
-        if (name == null ||
-         birthDate == null ||
-          signupDate == null) 
-          {
-            throw new IllegalArgumentException("Client dates and name are required.");
-        }
-        if (clientId == null ||
-                (clientId.length() != MIN_ID_LENGTH &&
-                    clientId.length() != MAX_ID_LENGTH) ||
-                !clientId.matches("[0-9]+"))
-        {
-            throw new IllegalArgumentException("Client ID must contain 6 or 7 characters.");
-        }
-        this.name       = name;
-        this.birthDate  = birthDate;
-        this.deathDate  = deathDate;
-        this.signupDate = signupDate;
-        this.clientId   = clientId;
+        MIN_ID_LENGTH = 12;
+        MAX_ID_LENGTH = 20;
     }
 
     /**
-     * Get client name.
+     * Constructs a bank client.
      *
-     * @return client name
+     * @param name       the client's name
+     * @param birthDate  the client's birth date
+     * @param deathDate  the client's death date, or null if alive
+     * @param signupDate the date the client joined the bank
+     * @param clientID   the client's six or seven character ID
+     *
+     * @throws IllegalArgumentException if required data is invalid
      */
-    public Name getName() 
+    public BankClient(final Name name,
+                      final Date birthDate,
+                      final Date deathDate,
+                      final Date signupDate,
+                      final String clientID)
+    {
+        if (name == null)
+        {
+            throw new IllegalArgumentException(
+                    "Name cannot be null.");
+        }
+
+        if (birthDate == null)
+        {
+            throw new IllegalArgumentException(
+                    "Birth date cannot be null.");
+        }
+
+        if (signupDate == null)
+        {
+            throw new IllegalArgumentException(
+                    "Signup date cannot be null.");
+        }
+
+        if (clientID == null)
+        {
+            throw new IllegalArgumentException(
+                    "Client ID cannot be null.");
+        }
+
+        if (clientID.length() < MIN_ID_LENGTH
+                || clientID.length() > MAX_ID_LENGTH)
+        {
+            throw new IllegalArgumentException(
+                    "Client ID must contain {@link #MIN_ID_LENGTH} to {@link #MAX_ID_LENGTH} characters.");
+        }
+
+        this.name = name;
+        this.birthDate  = birthDate;
+        this.deathDate  = deathDate;
+        this.signupDate = signupDate;
+        this.clientID   = clientID;
+    }
+
+    /**
+     * Returns the client's name.
+     *
+     * @return the client's name
+     */
+    public Name getName()
     {
         return name;
     }
 
     /**
-     * Gets the client's birth date.
+     * Returns the client's birth date.
      *
-     * @return client's birth date
+     * @return the birth date
      */
     public Date getBirthDate()
     {
@@ -78,46 +100,75 @@ public class BankClient
     }
 
     /**
-     * Checks if someone is alive.
+     * Returns the client's death date.
      *
-    * @return true if alive
-    */
+     * @return the death date, or null if the client is alive
+     */
+    public Date getDeathDate()
+    {
+        return deathDate;
+    }
+
+    /**
+     * Returns the signup date.
+     *
+     * @return the signup date
+     */
+    public Date getSignupDate()
+    {
+        return signupDate;
+    }
+
+    /**
+     * Returns the client ID.
+     *
+     * @return the client ID
+     */
+    public String getClientID()
+    {
+        return clientID;
+    }
+
+    /**
+     * Determines whether this client is alive.
+     *
+     * @return true if there is no death date
+     */
     public boolean isAlive()
     {
         return deathDate == null;
     }
 
     /**
-        * Formats the client's details, including the living status and signup date.
+     * Returns formatted information about the bank client.
      *
-    * @return formatted details
-    */
+     * @return the client's details
+     */
     public String getDetails()
     {
-        final String status;
+        final String lifeStatus;
 
         if (isAlive())
         {
-            status = "(alive)";
-        } 
-        else 
+            lifeStatus = "alive";
+        }
+        else
         {
-            status = "(not alive)";
+            lifeStatus = "not alive";
         }
 
-        return name.getFullName()      +
-            " client #"                +
-            clientId                   +
-            " "                        +
-            status                     +
-            " joined the bank on "     +
-            signupDate.getDayName()    +
-            ", "                       +
-            signupDate.getMonthName()  +
-            " "                        +
-            signupDate.getDay()        +
-            ", "                       +
-            signupDate.getYear();
+        return name.getFullName() +
+                " client #" +
+                clientID +
+                " (" +
+                lifeStatus +
+                ") joined the bank on " +
+                signupDate.getDayOfWeek() +
+                ", " +
+                signupDate.getMonth() +
+                " " +
+                signupDate.getDay() +
+                ", " +
+                + signupDate.getYear();
     }
-
 }

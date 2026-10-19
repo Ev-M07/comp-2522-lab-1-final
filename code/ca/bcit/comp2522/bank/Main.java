@@ -1,109 +1,142 @@
 package ca.bcit.comp2522.bank;
 
 /**
- * Demonstrates the banking system.
+ * Runs the banking system simulation for Lab 1.
  *
  * @author Abhia Salman
- * 
  * @author Evelyn Millman
- * 
  * @version 1.0
  */
 public class Main
 {
-
     /**
-     * Runs the banking system demonstration.
+     * Runs the banking system examples required by the lab.
      *
-     * @param args command-line arguments, which are not used
+     * @param args unused command-line arguments
      */
-        public static void main(final String[] args)
-        {
+    public static void main(final String[] args)
+    {
         final Name einsteinName;
-        final Date einBirth;
-        final Date einDeath;
-        final Date einSignup;
-        final BankClient einClient;
-        final BankAccount einAccount;
+        final BankClient einsteinClient;
+        final BankAccount einsteinAccount;
 
         final Name mandelaName;
-        final Date mandelaBirth;
-        final Date mandelaDeath;
-        final Date mandelaSignup;
         final BankClient mandelaClient;
         final BankAccount mandelaAccount;
 
         final Name kahloName;
-        final Date kahloBirth;
-        final Date kahloDeath;
-        final Date kahloSignup;
         final BankClient kahloClient;
         final BankAccount kahloAccount;
 
         final Name chanName;
-        final Date chanBirth;
-        final Date chanSignup;
         final BankClient chanClient;
         final BankAccount chanAccount;
 
         einsteinName = new Name("Albert", "Einstein");
-        einBirth     = new Date(1879, 3, 14);
-        einDeath     = new Date(1955, 4, 18);
-        einSignup    = new Date(1900, 1, 1);
-        einClient    = new BankClient(einsteinName, einBirth, einDeath, einSignup, "123456");
-        einAccount   = new BankAccount(einClient, "123456", 3141, einSignup,
-                new Date(1950, 10, 14), 1000);
-        einAccount.withdraw(100);
-        printDetails(einsteinName, 
-        einClient,
-         einAccount);
 
-        mandelaName   = new Name("Nelson", "Mandela");
-        mandelaBirth  = new Date(1918, 7, 18);
-        mandelaDeath  = new Date(2013, 12, 5);
-        mandelaSignup = new Date(1994, 5, 10);
-        mandelaClient = new BankClient(mandelaName, mandelaBirth, mandelaDeath,
-                mandelaSignup, "654321");
-        mandelaAccount = new BankAccount(mandelaClient, "654321", 4664,
-                mandelaSignup, null, 2000);
-        mandelaAccount.withdraw(200);
-        printDetails(mandelaName,
-         mandelaClient,
-          mandelaAccount);
+        einsteinClient = new BankClient(
+                einsteinName,
+                new Date(1879, 3, 14),
+                new Date(1955, 4, 18),
+                new Date(1900, 1, 1),
+                "1234567891011");
 
-        kahloName   = new Name("Frida", "Kahlo");
-        kahloBirth  = new Date(1907, 7, 6);
-        kahloDeath  = new Date(1954, 7, 13);
-        kahloSignup = new Date(1940, 1, 1);
-        kahloClient = new BankClient(kahloName, kahloBirth, kahloDeath,
-                kahloSignup, "123457");
-        kahloAccount = new BankAccount(kahloClient, "123457", 1907,
-                kahloSignup, kahloDeath, 500);
-        kahloAccount.withdraw(50);
-        printDetails(kahloName,
-         kahloClient,
-          kahloAccount);
+        einsteinAccount = new BankAccount(
+                einsteinClient,
+                1000.0,
+                3141,
+                "abc1234567891011121314",
+                new Date(1900, 1, 1),
+                new Date(1950, 10, 14));
 
-        chanName   = new Name("Jackie", "Chan");
-        chanBirth  = new Date(1954, 4, 7);
-        chanSignup = new Date(1980, 10, 1);
-        chanClient = new BankClient(chanName, chanBirth, null, chanSignup, "123458");
-        chanAccount = new BankAccount(chanClient, "123458", 1954,
-                chanSignup, null, 3000);
-        chanAccount.withdraw(500);
-        printDetails(chanName,
-         chanClient,
-          chanAccount);
-    }
+        System.out.println(einsteinName.getInitials());
+        System.out.println(einsteinName.getFullName());
+        System.out.println(einsteinName.getReverseName());
+        System.out.println(einsteinClient.getDetails());
 
-        private static void printDetails(final Name name,
-                                        final BankClient client,
-                                        final BankAccount account)
-        {
-        System.out.println(name.getInitials());
-        System.out.println(name.getFullName());
-        System.out.println(name.getReverseName());
-        System.out.println(client.getDetails());
-        System.out.println(account.getDetails());
+        einsteinAccount.withdraw(100.0);
+
+        System.out.println(einsteinAccount.getDetails());
+        System.out.println();
+
+        mandelaName = new Name("Nelson", "Mandela");
+
+        mandelaClient = new BankClient(
+                mandelaName,
+                new Date(1918, 7, 18),
+                new Date(2013, 12, 5),
+                new Date(1994, 5, 10),
+                "1110987654321");
+
+        mandelaAccount = new BankAccount(
+                mandelaClient,
+                2000.0,
+                4664,
+                "151413121110987654321",
+                new Date(1994, 5, 10),
+                null);
+
+        System.out.println(mandelaName.getInitials());
+        System.out.println(mandelaName.getFullName());
+        System.out.println(mandelaName.getReverseName());
+        System.out.println(mandelaClient.getDetails());
+
+        mandelaAccount.withdraw(200.0);
+
+        System.out.println(mandelaAccount.getDetails());
+        System.out.println();
+
+        kahloName = new Name("Frida", "Kahlo");
+
+        kahloClient = new BankClient(
+                kahloName,
+                new Date(1907, 7, 6),
+                new Date(1954, 7, 13),
+                new Date(1940, 1, 1),
+                "frd123456789");
+
+        kahloAccount = new BankAccount(
+                kahloClient,
+                500.0,
+                1907,
+                "frd123456789101112131415",
+                new Date(1940, 1, 1),
+                new Date(1954, 7, 13));
+
+        System.out.println(kahloName.getInitials());
+        System.out.println(kahloName.getFullName());
+        System.out.println(kahloName.getReverseName());
+        System.out.println(kahloClient.getDetails());
+
+        kahloAccount.withdraw(50.0);
+
+        System.out.println(kahloAccount.getDetails());
+        System.out.println();
+
+        chanName = new Name("Jackie", "Chan");
+
+        chanClient = new BankClient(
+                chanName,
+                new Date(1954, 4, 7),
+                null,
+                new Date(1980, 10, 1),
+                "chan789101112");
+
+        chanAccount = new BankAccount(
+                chanClient,
+                3000.0,
+                1954,
+                "chan78910111213141516",
+                new Date(1980, 10, 1),
+                null);
+
+        System.out.println(chanName.getInitials());
+        System.out.println(chanName.getFullName());
+        System.out.println(chanName.getReverseName());
+        System.out.println(chanClient.getDetails());
+
+        chanAccount.withdraw(500.0);
+
+        System.out.println(chanAccount.getDetails());
     }
 }

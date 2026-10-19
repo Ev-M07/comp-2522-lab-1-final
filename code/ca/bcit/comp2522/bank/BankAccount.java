@@ -1,159 +1,227 @@
 package ca.bcit.comp2522.bank;
 
 /**
- * Represents a bank account class.
+ * Represents a bank account belonging to a BankClient.
  *
  * @author Abhia Salman
  * @author Evelyn Millman
- * @author Jaden McDonald
- *
  * @version 1.0
  */
-public class BankAccount 
+public class BankAccount
 {
-
-    private static final int    MIN_ACCOUNT_NUMBER = 0;
-    private static final int    MAX_ACCOUNT_NUMBER = 0;
-    private static final int    MIN_ACCOUNT_NUMBER_LENGTH = 6;
-    private static final int    MAX_ACCOUNT_NUMBER_LENGTH = 7;
-    private static final double MIN_BALANCE_USD = 0.0;
+    private static final int MIN_ACCOUNT_NUMBER_LENGTH;
+    private static final int MAX_ACCOUNT_NUMBER_LENGTH;
 
     private final BankClient client;
-    private final String     accountNumber;
-    private final int        pin;
-    private final Date       opened;
-    private final Date       closed;
-
     private double balanceUsd;
+    private final int pin;
+    private final String accountNumber;
+    private final Date accountOpened;
+    private final Date accountClosed;
 
-    /**
-     * The bank account constructor validates the client, account number, PIN, and open and close dates.
-     *
-     * @param client         client of bank
-     * @param accountNumber  bank account number
-     * @param pin            PIN
-     * @param opened         opened bank account
-     * @param closed         closed bank account
-     * @param initialBalance initial balance of bank account
-     * 
-     *  @throws IllegalArgumentException if an account value is invalid
-     */
-    public BankAccount(final BankClient client,
-                       final String     accountNumber,
-                       final int        pin,
-                       final Date       opened,
-                       final Date       closed,
-                       final double     initialBalance) 
-                       {
-        if (client == null ||
-         accountNumber == null ||
-                (accountNumber.length() != MIN_ACCOUNT_NUMBER_LENGTH &&
-                    accountNumber.length() != MAX_ACCOUNT_NUMBER_LENGTH) ||
-                    !accountNumber.matches("[0-9]+") ||
-                     opened == null                  ||
-                    initialBalance < MIN_BALANCE_USD) 
-                {
-            throw new IllegalArgumentException("Invalid bank account details.");
-        }
-        this.client        = client;
-        this.accountNumber = accountNumber;
-        this.pin           = pin;
-        this.opened        = opened;
-        this.closed        = closed;
-        this.balanceUsd    = initialBalance;
+    static
+    {
+        MIN_ACCOUNT_NUMBER_LENGTH = 21;
+        MAX_ACCOUNT_NUMBER_LENGTH = 30;
     }
 
     /**
-     * Deposit  USD money.
+     * Constructs a bank account.
      *
-     * @param amountUsd amount in USD
+     * @param client        the owner of the account
+     * @param balanceUsd    the starting balance in USD
+     * @param pin           the account PIN
+     * @param accountNumber the six or seven character account number
+     * @param accountOpened the date the account opened
+     * @param accountClosed the closing date, or null if still open
+     *
+     * @throws IllegalArgumentException if account information is invalid
      */
-    public void deposit(final double amountUsd) 
+    public BankAccount(final BankClient client,
+                       final double balanceUsd,
+                       final int pin,
+                       final String accountNumber,
+                       final Date accountOpened,
+                       final Date accountClosed)
     {
+        if (client == null)
+        {
+            throw new IllegalArgumentException(
+                    "Client cannot be null.");
+        }
+
+        if (balanceUsd < 0)
+        {
+            throw new IllegalArgumentException(
+                    "Balance cannot be negative.");
+        }
+
+        if (accountNumber == null)
+        {
+            throw new IllegalArgumentException(
+                    "Account number cannot be null.");
+        }
+
+        if (accountNumber.length() < MIN_ACCOUNT_NUMBER_LENGTH ||
+                accountNumber.length() > MAX_ACCOUNT_NUMBER_LENGTH)
+        {
+            throw new IllegalArgumentException(
+                    "Account number must contain {@link #MIN_ACCOUNT_NUMBER_LENGTH} " +
+                            "or {@link #MAX_ACCOUNT_NUMBER_LENGTH} characters.");
+        }
+
+        if (accountOpened == null)
+        {
+            throw new IllegalArgumentException(
+                    "Account opening date cannot be null.");
+        }
+
+        this.client = client;
+        this.balanceUsd = balanceUsd;
+        this.pin = pin;
+        this.accountNumber = accountNumber;
+        this.accountOpened = accountOpened;
+        this.accountClosed = accountClosed;
+    }
+
+    /**
+     * Deposits money into the account.
+     *
+     * @param amountUsd the amount in USD to deposit
+     *
+     * @throws IllegalArgumentException if the amount is not positive
+     */
+    public void deposit(final double amountUsd)
+    {
+        if (amountUsd <= 0)
+        {
+            throw new IllegalArgumentException(
+                    "Deposit amount must be positive.");
+        }
+
         balanceUsd += amountUsd;
     }
 
     /**
-     * withdraw USD money.
-     * 
-     * @param amountUsd amount in USD
+     * Withdraws money without checking a PIN.
+     *
+     * @param amountUsd the amount in USD to withdraw
+     *
+     * @throws IllegalArgumentException if the amount is invalid
      */
-    public void withdraw(final double amountUsd) 
+    public void withdraw(final double amountUsd)
     {
+        validateWithdrawal(amountUsd);
+
         balanceUsd -= amountUsd;
     }
 
     /**
-     * Withdraw USD money, requires PIN.
+     * Withdraws money after checking the supplied PIN.
      *
-     * @param amountUsd amount in USD
+     * @param amountUsd  the amount in USD to withdraw
+     * @param pinToMatch the PIN supplied for authentication
      *
-     * @param pinToMatch PIN
+     * @throws IllegalArgumentException if the PIN or amount is invalid
      */
     public void withdraw(final double amountUsd,
                          final int pinToMatch)
     {
-        if (pinToMatch == pin)
+        if (pin != pinToMatch)
         {
-            balanceUsd -= amountUsd;
+            throw new IllegalArgumentException(
+                    "Incorrect PIN.");
+        }
+
+        withdraw(amountUsd);
+    }
+
+    /**
+     * Validates a requested withdrawal.
+     *
+     * @param amountUsd the requested amount in USD
+     *
+     * @throws IllegalArgumentException if the amount cannot be withdrawn
+     */
+    private void validateWithdrawal(final double amountUsd)
+    {
+        if (amountUsd <= 0)
+        {
+            throw new IllegalArgumentException(
+                    "Withdrawal amount must be positive.");
+        }
+
+        if (amountUsd > balanceUsd)
+        {
+            throw new IllegalArgumentException(
+                    "Insufficient funds.");
         }
     }
 
     /**
-     * Get details for bank account.
+     * Returns the current account balance.
      *
-     * @return bank account details.
+     * @return the balance in USD
      */
-    public String getDetails() 
+    public double getBalanceUsd()
     {
-        final String closedStr;
-
-        if (closed == null)
-        {
-            closedStr = "and is still open.";
-        } 
-        else
-        {
-            closedStr = "and closed "               +
-                    capitalize(closed.getDayName()) +
-                    " "                             +
-                    closed.getMonthName()           +
-                    " "                             +
-                    closed.getDay()                 +
-                    ", "                            +
-                    closed.getYear()                +
-                    ".";
-        }
-
-        return client.getName()
-                     .getFullName()
-                                                +
-                " had $"                        +
-                balanceUsd                      +
-                " USD in account #"             +
-                accountNumber                   +
-                " which he opened on "          +
-                capitalize(opened.getDayName()) +
-                " "                             +
-                opened.getMonthName()           +
-                " "                             +
-                opened.getDay()                 +
-                ", " + opened.getYear()         +
-                " "                             +
-                closedStr;
+        return balanceUsd;
     }
 
     /**
-     * Capitalizes the first letter of a day name for account details.
+     * Returns formatted information about the bank account.
      *
-     * @param dayName lowercase day name
-     * 
-     * @return day name with an uppercase first letter
+     * @return the account details
      */
-    private String capitalize(final String dayName) 
+    public String getDetails()
     {
-        return dayName.substring(0, 1).toUpperCase() +
-         dayName.substring(1);
+        final StringBuilder details;
+
+        details = new StringBuilder();
+
+        details.append(client.getName().getFullName());
+        details.append(" had $");
+        details.append(String.format("%.0f", balanceUsd));
+        details.append(" USD in account #");
+        details.append(accountNumber);
+        details.append(" which ");
+        details.append("opened on ");
+        details.append(capitalize(accountOpened.getDayOfWeek()));
+        details.append(" ");
+        details.append(accountOpened.getMonth());
+        details.append(" ");
+        details.append(accountOpened.getDay());
+        details.append(", ");
+        details.append(accountOpened.getYear());
+
+        if (accountClosed != null)
+        {
+            details.append(" and closed ");
+            details.append(capitalize(
+                    accountClosed.getDayOfWeek()));
+            details.append(" ");
+            details.append(accountClosed.getMonth());
+            details.append(" ");
+            details.append(accountClosed.getDay());
+            details.append(", ");
+            details.append(accountClosed.getYear());
+        }
+
+        details.append(".");
+
+        return details.toString();
     }
 
+    /**
+     * Capitalizes the first character of a word.
+     *
+     * @param word the word to capitalize
+     *
+     * @return the capitalized word
+     */
+    private static String capitalize(final String word)
+    {
+        return word.substring(0, 1).toUpperCase() +
+                word.substring(1);
+    }
 }

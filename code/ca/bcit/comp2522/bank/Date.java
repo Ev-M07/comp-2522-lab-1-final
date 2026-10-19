@@ -1,7 +1,7 @@
 package ca.bcit.comp2522.bank;
 
 /**
- * Represents a calendar date.
+ * Represents a calendar date containing a year, month, and day.
  *
  * @author Abhia Salman
  * @author Evelyn Millman
@@ -9,352 +9,574 @@ package ca.bcit.comp2522.bank;
  */
 public class Date
 {
-    /**
-     * Min and Max year.
-     */
-	private static final int MIN_YEAR = 1805;
-	private static final int MAX_YEAR = 2021;
-    
-    /**
-     * Month constants.
-     */
-	private static final int JAN = 1;
-	private static final int FEB = 2;
-	private static final int MAR = 3;
-	private static final int APR = 4;
-	private static final int MAY = 5;
-	private static final int JUN = 6;
-	private static final int JUL = 7;
-	private static final int AUG = 8;
-	private static final int SEP = 9;
-	private static final int OCT = 10;
-	private static final int NOV = 11;
-	private static final int DEC = 12;
+    private static final int MIN_YEAR;
+    private static final int MAX_YEAR;
+    private static final int MIN_MONTH;
+    private static final int MAX_MONTH;
+    private static final int MIN_DAY;
+
+    private static final int JANUARY;
+    private static final int FEBRUARY;
+    private static final int MARCH;
+    private static final int APRIL;
+    private static final int MAY;
+    private static final int JUNE;
+    private static final int JULY;
+    private static final int AUGUST;
+    private static final int SEPTEMBER;
+    private static final int OCTOBER;
+    private static final int NOVEMBER;
+    private static final int DECEMBER;
+
+    private static final int DAYS_IN_FEBRUARY;
+    private static final int DAYS_IN_LEAP_FEBRUARY;
+    private static final int DAYS_IN_SHORT_MONTH;
+    private static final int DAYS_IN_LONG_MONTH;
+
+    private static final int SATURDAY;
+    private static final int SUNDAY;
+    private static final int MONDAY;
+    private static final int TUESDAY;
+    private static final int WEDNESDAY;
+    private static final int THURSDAY;
+    private static final int FRIDAY;
+
+    private static final int TWELVES_DIVISOR;
+    private static final int FOURS_DIVISOR;
+    private static final int DAYS_PER_WEEK;
+    private static final int YEAR_MODULUS;
+    private static final int EIGHTEEN_HUNDREDS_OFFSET;
+    private static final int EIGHTEEN_HUNDREDS_THRESHOLD;
+    private static final int TWO_THOUSANDS_OFFSET;
+    private static final int TWO_THOUSANDS_THRESHOLD;
+    private static final int LEAP_YEAR_OFFSET;
+    private static final int LEAP_YEAR_FREQUENCY;
+    private static final int ONE_CENTURY;
+    private static final int FOUR_CENTURY;
+
+    private final int year;
+    private final int month;
+    private final int day;
+
+    static
+    {
+        MIN_YEAR = 1805;
+        MAX_YEAR = 2021;
+
+        MIN_MONTH = 1;
+        MAX_MONTH = 12;
+        MIN_DAY   = 1;
+
+        JANUARY   = 1;
+        FEBRUARY  = 2;
+        MARCH     = 3;
+        APRIL     = 4;
+        MAY       = 5;
+        JUNE      = 6;
+        JULY      = 7;
+        AUGUST    = 8;
+        SEPTEMBER = 9;
+        OCTOBER   = 10;
+        NOVEMBER  = 11;
+        DECEMBER  = 12;
+
+        DAYS_IN_FEBRUARY      = 28;
+        DAYS_IN_LEAP_FEBRUARY = 29;
+        DAYS_IN_SHORT_MONTH   = 30;
+        DAYS_IN_LONG_MONTH    = 31;
+
+        SATURDAY  = 0;
+        SUNDAY    = 1;
+        MONDAY    = 2;
+        TUESDAY   = 3;
+        WEDNESDAY = 4;
+        THURSDAY  = 5;
+        FRIDAY    = 6;
+
+        TWELVES_DIVISOR = 12;
+        FOURS_DIVISOR   = 4;
+        DAYS_PER_WEEK   = 7;
+        YEAR_MODULUS    = 100;
+
+        EIGHTEEN_HUNDREDS_OFFSET    = 2;
+        EIGHTEEN_HUNDREDS_THRESHOLD = 1900;
+        TWO_THOUSANDS_OFFSET        = 6;
+        TWO_THOUSANDS_THRESHOLD     = 2000;
+        LEAP_YEAR_OFFSET            = 6;
+
+        LEAP_YEAR_FREQUENCY = 4;
+        ONE_CENTURY         = 100;
+        FOUR_CENTURY        = 400;
+    }
 
     /**
-     * Month codes for calculating the day of the week.
+     * Constructs a {@code Date}, validating that the year, month, and day
+     * together form a real calendar date.
+     *
+     * @param year  must be valid
+     * @param month must be valid
+     * @param day   must be valid
+     *
+     * @throws IllegalArgumentException if year, month, or day is not valid
      */
-	private static final int JAN_CODE = 1;
-	private static final int FEB_CODE = 4;
-	private static final int MAR_CODE = 4;
-	private static final int APR_CODE = 0;
-	private static final int MAY_CODE = 2;
-	private static final int JUN_CODE = 5;
-	private static final int JUL_CODE = 0;
-	private static final int AUG_CODE = 3;
-	private static final int SEP_CODE = 6;
-	private static final int OCT_CODE = 1;
-	private static final int NOV_CODE = 4;
-	private static final int DEC_CODE = 6;
+    public Date(final int year,
+                final int month,
+                final int day)
+    {
+        validateYear(year);
+        validateMonth(month);
+        validateDay(year, month, day);
+
+        this.year = year;
+        this.month = month;
+        this.day = day;
+    }
 
     /**
-     * Day constants.
+     * Validates that a year falls within the supported range.
+     *
+     * @param year the year to validate
+     *
+     * @throws IllegalArgumentException if {@code year} is less than
+     *                                  {@link #MIN_YEAR} or greater than
+     *                                  {@link #MAX_YEAR}
      */
-	private static final int MIN_DAY      = 1;
-	private static final int MAX_DAY_31   = 31;
-	private static final int MAX_DAY_30   = 30;
-	private static final int MAX_DAY_29   = 29;
-	private static final int MAX_DAY_28   = 28;
+    private static void validateYear(final int year)
+    {
+        if (year < MIN_YEAR || year > MAX_YEAR)
+        {
+            throw new IllegalArgumentException("Year must be between " +
+                    MIN_YEAR + " and " + MAX_YEAR + ". Received: " + year);
+        }
+    }
 
     /**
-     * Leap year constants. 
+     * Validates that a month is within the valid calendar range.
+     *
+     * @param month the month to validate
+     *
+     * @throws IllegalArgumentException if {@code month} is less than
+     *                                  {@link #MIN_MONTH} or greater than
+     *                                  {@link #MAX_MONTH}
      */
-	private static final int LEAP_DIV_4   = 4;
-	private static final int LEAP_DIV_100 = 100;
-	private static final int LEAP_DIV_400 = 400;
-	private static final int DAY_TEN      = 10;
+    private static void validateMonth(final int month)
+    {
+        if (month < MIN_MONTH || month > MAX_MONTH)
+        {
+            throw new IllegalArgumentException("Month must be between " +
+                    MIN_MONTH + " and " + MAX_MONTH + ". Received: " + month);
+        }
+    }
 
     /**
-     * Adjustment constants for calculating the day of the week.
+     * Validates that a day is within the valid range for the given month
+     * and year, accounting for leap years.
+     *
+     * @param year  the year the day belongs to
+     * @param month the month the day belongs to
+     * @param day   the day to validate
+     *
+     * @throws IllegalArgumentException if {@code day} is less than
+     *                                  {@link #MIN_DAY} or greater than the
+     *                                  number of days in the given month/year
      */
-	private static final int ADJUST_2000 = 6;
-	private static final int ADJUST_1800 = 2;
-	private static final int LEAP_ADJUST = 6;
+    private static void validateDay(final int year,
+                                    final int month,
+                                    final int day)
+    {
+        if (day < MIN_DAY || day > getMaximumDays(month, year))
+        {
+            throw new IllegalArgumentException("Day must be between " +
+                    MIN_DAY + " and " + getMaximumDays(month, year) + ". Received: " + day);
+        }
+    }
 
     /**
-     * Day of the week constants.
+     * Returns the maximum number of days in the given month.
+     *
+     * @param month the month to check
+     * @param year  the year of the month
+     *
+     * @return the maximum number of days in the month
      */
-	private static final int SATURDAY  = 0;
-	private static final int SUNDAY    = 1;
-	private static final int MONDAY    = 2;
-	private static final int TUESDAY   = 3;
-	private static final int WEDNESDAY = 4;
-	private static final int THURSDAY  = 5;
-	private static final int FRIDAY    = 6;
+    private static int getMaximumDays(final int month,
+                                      final int year)
+    {
+        final int maximumDays;
 
-	private final int year;
-	private final int month;
-	private final int day;
+        if (month == FEBRUARY)
+        {
+            if (isLeapYear(year))
+            {
+                maximumDays = DAYS_IN_LEAP_FEBRUARY;
+            }
+            else
+            {
+                maximumDays = DAYS_IN_FEBRUARY;
+            }
+        }
+        else if (month == APRIL ||
+                month == JUNE ||
+                month == SEPTEMBER ||
+                month == NOVEMBER)
+        {
+            maximumDays = DAYS_IN_SHORT_MONTH;
+        }
+        else
+        {
+            maximumDays = DAYS_IN_LONG_MONTH;
+        }
 
-	/**
-	 * Creates a valid calendar date.
-	 *
-	 * @param year year from 1805 through 2021
-	 * @param month month from 1 through 12
-	 * @param day valid day for the month
-	 * @throws IllegalArgumentException if the date is invalid
-	 */
-	public Date(final int year,
-				final int month,
-				final int day)
-	{
-		validate(year, month, day);
-		this.year = year;
-		this.month = month;
-		this.day = day;
-	}
+        return maximumDays;
+    }
 
-	private void validate(final int year,
-						  final int month,
-						  final int day)
-	{
-		int maximumDay;
+    /**
+     * Determines whether the given year is a leap year.
+     *
+     * @param year the year to check
+     *
+     * @return true if the year is a leap year, false otherwise
+     */
+    private static boolean isLeapYear(final int year)
+    {
+        final boolean leapYear;
 
-		if (year < MIN_YEAR || year > MAX_YEAR)
-		{
-			throw new IllegalArgumentException("Invalid year.");
-		}
-		if (month < JAN || month > DEC)
-		{
-			throw new IllegalArgumentException("Invalid month.");
-		}
-		maximumDay = MAX_DAY_31;
+        if (year % FOUR_CENTURY == 0)
+        {
+            leapYear = true;
+        }
+        else if (year % ONE_CENTURY == 0)
+        {
+            leapYear = false;
+        }
+        else
+        {
+            leapYear = year % LEAP_YEAR_FREQUENCY == 0;
+        }
 
-		if (month == FEB)
-		{
-			if (isLeap(year))
-			{
-				maximumDay = MAX_DAY_29;
-			}
-			else
-			{
-				maximumDay = MAX_DAY_28;
-			}
-		}
-		if (month == APR     ||
-				month == JUN ||
-				month == SEP ||
-				month == NOV)
-		{
-			maximumDay = MAX_DAY_30;
-		}
-		if (day < MIN_DAY ||
-         day > maximumDay)
-		{
-			throw new IllegalArgumentException("Invalid day.");
-		}
-	}
+        return leapYear;
+    }
 
-	private boolean isLeap(final int year)
-	{
-		return year % LEAP_DIV_4 == 0 &&
-				(year % LEAP_DIV_100 != 0 || 
-                 year % LEAP_DIV_400 == 0);
-	}
+    /**
+     * Returns the year.
+     *
+     * @return the year
+     */
+    public int getYear()
+    {
+        return year;
+    }
 
-	/**
-	 * @return day of the month
-	 */
-	public int getDay()
-	{
-		return day;
-	}
+    /**
+     * Returns the month.
+     *
+     * @return the month
+     */
+    public int getMonth()
+    {
+        return month;
+    }
 
-	/**
-	 * @return month number
-	 */
-	public int getMonth()
-	{
-		return month;
-	}
+    /**
+     * Returns the day.
+     *
+     * @return the day
+     */
+    public int getDay()
+    {
+        return day;
+    }
 
-	/**
-	 * @return year number
-	 */
-	public int getYear()
-	{
-		return year;
-	}
+    /**
+     * Returns the date formatted as YYYY-MM-DD.
+     *
+     * @return the formatted date
+     */
+    public String getYYYYMMDD()
+    {
+        final String monthString;
+        final String dayString;
 
-	/**
-	 * Formats the date as YYYY-MM-DD.
-	 *
-	 * @return formatted date
-	 */
-	public String getYYYYMMDD()
-	{
-		final String monthText;
-		final String dayText;
+        if (month < OCTOBER)
+        {
+            monthString = "0" + month;
+        }
+        else
+        {
+            monthString = String.valueOf(month);
+        }
 
-		if (month < DAY_TEN)
-		{
-			monthText = "0" + month;
-		}
-		else
-		{
-			monthText = "" + month;
-		}
-		if (day < DAY_TEN)
-		{
-			dayText = "0" + day;
-		}
-		else
-		{
-			dayText = "" + day;
-		}
-		return year        +
-				"-"        +
-				monthText  +
-				"-"        +
-				dayText;
-	}
+        if (day < OCTOBER)
+        {
+            dayString = "0" + day;
+        }
+        else
+        {
+            dayString = String.valueOf(day);
+        }
 
-	/**
-	 * Formats the date as YYYY-MM-DD.
-	 *
-	 * @return formatted date
-	 */
-	public String getYyyyMmDd()
-	{
-		return getYYYYMMDD();
-	}
+        return year + "-" + monthString + "-" + dayString;
+    }
 
-	/**
-	 * Calculates the day of the week using the lab's prescribed method.
-	 *
-	 * @return value from 0 for Saturday through 6 for Friday
-	 */
-	public int getDayOfWeek()
-	{
-		final int yearPart;
-		final int twelves;
-		final int remainder;
-		final int fours;
-		final int monthCode;
-		int sum;
+    /**
+     * Determines the day of the week for the date represented by this
+     * {@code Date}.
+     * The last two digits of the year are extracted by taking the year modulo
+     * {@link #YEAR_MODULUS}. That value is divided by {@link #TWELVES_DIVISOR}
+     * to get the number of complete groups of twelve, and the remainder is
+     * computed as the two-digit year minus the number of twelves multiplied by
+     * {@link #TWELVES_DIVISOR}. The remainder is then divided by
+     * {@link #FOURS_DIVISOR} using integer division to get the number of
+     * complete groups of four it contains.
+     * The number of twelves, the remainder, the number of fours, the day of the
+     * month, and the month code returned by {@link #getMonthCode()} are summed
+     * into a running total. The following adjustments are then applied to that
+     * total:
+     * - If the year is less than {@link #EIGHTEEN_HUNDREDS_THRESHOLD},
+     *   {@link #EIGHTEEN_HUNDREDS_OFFSET} is added.
+     * - If the year is greater than or equal to
+     *   {@link #TWO_THOUSANDS_THRESHOLD}, {@link #TWO_THOUSANDS_OFFSET} is
+     *   added.
+     * - If {@link #isLeapYear(int)} returns {@code true} for the year and the
+     *   month is January or February, {@link #LEAP_YEAR_OFFSET} is added. This
+     *   compensates for the leap day not having occurred yet in those months.
+     * Years that are greater than or equal to
+     * {@link #EIGHTEEN_HUNDREDS_THRESHOLD} and less than
+     * {@link #TWO_THOUSANDS_THRESHOLD} require no century adjustment.
+     * The adjusted total is reduced modulo {@link #DAYS_PER_WEEK}, and the
+     * result is passed to {@link #getDayName(int)}. The values correspond to:
+     * 0 = Saturday, 1 = Sunday, 2 = Monday, 3 = Tuesday, 4 = Wednesday,
+     * 5 = Thursday, and 6 = Friday.
+     * This method does not modify the state of this object. It assumes the
+     * {@code year}, {@code month}, and {@code day} fields were validated by the
+     * constructor and performs no validation of its own.
+     * @return the lowercase name of the day of the week on which this date
+     *         falls (for example, {@code "monday"})
+     */
+    public String getDayOfWeek()
+    {
+        final int twoDigitYear;
+        final int numberOfTwelves;
+        final int remainder;
+        final int numberOfFours;
+        final int monthCode;
 
-		yearPart = year % 100;
-		twelves = yearPart / 12;
-		remainder = yearPart % 12;
-		fours = remainder / 4;
-		monthCode = getMonthCode();
-		sum = day         +
-				twelves   +
-				remainder +
-				fours     +
-				monthCode;
-		if (year >= 2000)
-		{
-			sum += ADJUST_2000;
-		}
-		else if (year < 1900)
-		{
-			sum += ADJUST_1800;
-		}
-		if (isLeap(year) && (month == JAN ||
-         month == FEB))
-		{
-			sum += LEAP_ADJUST;
-		}
-		return sum % 7;
-	}
+        int total;
+        final int dayOfWeek;
 
-	/**
-	 * Provides the alternate spelling required by the lab.
-	 *
-	 * @return value from 0 for Saturday through 6 for Friday
-	 */
-	public int getDayOfTheWeek()
-	{
-		return getDayOfWeek();
-	}
+        twoDigitYear = year % YEAR_MODULUS;
 
-	/**
-	 * @return lowercase day name
-	 */
-	public String getDayName()
-	{
-		final int dayOfWeek;
+        numberOfTwelves = twoDigitYear / TWELVES_DIVISOR;
 
-		dayOfWeek = getDayOfWeek();
-		if (dayOfWeek == SATURDAY)
-		{
-			return "saturday";
-		}
-		if (dayOfWeek == SUNDAY)
-		{
-			return "sunday";
-		}
-		if (dayOfWeek == MONDAY)
-		{
-			return "monday";
-		}
-		if (dayOfWeek == TUESDAY)
-		{
-			return "tuesday";
-		}
-		if (dayOfWeek == WEDNESDAY)
-		{
-			return "wednesday";
-		}
-		if (dayOfWeek == THURSDAY)
-		{
-			return "thursday";
-		}
-		if (dayOfWeek == FRIDAY)
-		{
-			return "friday";
-		}
-		return "friday";
-	}
+        remainder = twoDigitYear -
+                numberOfTwelves * TWELVES_DIVISOR;
 
-	/**
-     
-Returns the English name of the month.*
-@return the month name*/
-public String getMonthName(){
-    if (month == JAN) return  "January";
-    if (month == FEB) return  "February";
-    if (month == MAR) return  "March";
-    if (month == APR) return  "April";
-    if (month == MAY) return  "May";
-    if (month == JUN) return  "June";
-    if (month == JUL) return  "July";
-    if (month == AUG) return  "August";
-    if (month == SEP) return  "September";
-    if (month == OCT) return  "October";
-    if (month == NOV) return  "November";
-    return                    "December";}
+        numberOfFours = remainder / FOURS_DIVISOR;
 
-/**
-     
-The month code used in the method used to calculate  the day of the week.*
-The month codes:
-Jan=1,
-Feb=2,
-Mar=3,
-Apr=4,
-May=5,
-Jun=6,
-Jul=7,
-Aug=8,
-Sep=9,
-Oct=10,
-Nov=11,
-Dec=12*
-Used to compute the day of the week using modular math.*
-@return the month code for this date's month*/
-private int getMonthCode() {
-    if (month == JAN) return  JAN_CODE;
-    if (month == FEB) return  FEB_CODE;
-    if (month == MAR) return  MAR_CODE;
-    if (month == APR) return  APR_CODE;
-    if (month == MAY) return  MAY_CODE;
-    if (month == JUN) return  JUN_CODE;
-    if (month == JUL) return  JUL_CODE;
-    if (month == AUG) return  AUG_CODE;
-    if (month == SEP) return  SEP_CODE;
-    if (month == OCT) return  OCT_CODE;
-    if (month == NOV) return  NOV_CODE;
-    return                    DEC_CODE;}
+        monthCode = getMonthCode();
+
+        total = numberOfTwelves +
+                remainder +
+                numberOfFours +
+                day +
+                monthCode;
+
+        if (year < EIGHTEEN_HUNDREDS_THRESHOLD)
+        {
+            total += EIGHTEEN_HUNDREDS_OFFSET;
+        }
+
+        if (year >= TWO_THOUSANDS_THRESHOLD)
+        {
+            total += TWO_THOUSANDS_OFFSET;
+        }
+
+        if (isLeapYear(year) &&
+                (month == JANUARY || month == FEBRUARY))
+        {
+            total += LEAP_YEAR_OFFSET;
+        }
+
+        dayOfWeek = total % DAYS_PER_WEEK;
+
+        return getDayName(dayOfWeek);
+    }
+
+    /**
+     * Returns the month code required by the lab's day-of-week
+     * algorithm.
+     *
+     * @return the code for this date's month
+     * @throws IllegalArgumentException if the month is invalid
+     */
+    private int getMonthCode() throws IllegalArgumentException
+    {
+        final int monthCode;
+
+        if (month == JANUARY)
+        {
+            monthCode = 1;
+        }
+        else if (month == FEBRUARY)
+        {
+            monthCode = 4;
+        }
+        else if (month == MARCH)
+        {
+            monthCode = 4;
+        }
+        else if (month == APRIL)
+        {
+            monthCode = 0;
+        }
+        else if (month == MAY)
+        {
+            monthCode = 2;
+        }
+        else if (month == JUNE)
+        {
+            monthCode = 5;
+        }
+        else if (month == JULY)
+        {
+            monthCode = 0;
+        }
+        else if (month == AUGUST)
+        {
+            monthCode = 3;
+        }
+        else if (month == SEPTEMBER)
+        {
+            monthCode = 6;
+        }
+        else if (month == OCTOBER)
+        {
+            monthCode = 1;
+        }
+        else if (month == NOVEMBER)
+        {
+            monthCode = 4;
+        }
+        else if (month == DECEMBER)
+        {
+            monthCode = 6;
+        }
+        else
+        {
+            throw new IllegalArgumentException("Month must be between {@link #MIN_MONTH} and {@link #MAX_MONTH} (inclusively");
+        }
+
+        return monthCode;
+    }
+
+    /**
+     * Converts a numeric day-of-week value into its name.
+     *
+     * @param dayOfWeek the numeric day-of-week value
+     *
+     * @return the lowercase day name
+     *
+     * @throws IllegalArgumentException if the day is invalid
+     */
+    private static String getDayName(final int dayOfWeek)
+            throws IllegalArgumentException
+    {
+        final String dayName;
+
+        if (dayOfWeek == SATURDAY)
+        {
+            dayName = "saturday";
+        }
+        else if (dayOfWeek == SUNDAY)
+        {
+            dayName = "sunday";
+        }
+        else if (dayOfWeek == MONDAY)
+        {
+            dayName = "monday";
+        }
+        else if (dayOfWeek == TUESDAY)
+        {
+            dayName = "tuesday";
+        }
+        else if (dayOfWeek == WEDNESDAY)
+        {
+            dayName = "wednesday";
+        }
+        else if (dayOfWeek == THURSDAY)
+        {
+            dayName = "thursday";
+        }
+        else if (dayOfWeek == FRIDAY)
+        {
+            dayName = "friday";
+        }
+        else
+        {
+            throw new IllegalArgumentException("Day must be between 0 and 6 (inclusively");
+        }
+
+        return dayName;
+    }
+
+    /**
+     * Returns the English name of this date's month.
+     *
+     * @return the month name
+     */
+    public String getMonthName()
+    {
+        final String monthName;
+
+        if (month == JANUARY)
+        {
+            monthName = "January";
+        }
+        else if (month == FEBRUARY)
+        {
+            monthName = "February";
+        }
+        else if (month == MARCH)
+        {
+            monthName = "March";
+        }
+        else if (month == APRIL)
+        {
+            monthName = "April";
+        }
+        else if (month == MAY)
+        {
+            monthName = "May";
+        }
+        else if (month == JUNE)
+        {
+            monthName = "June";
+        }
+        else if (month == JULY)
+        {
+            monthName = "July";
+        }
+        else if (month == AUGUST)
+        {
+            monthName = "August";
+        }
+        else if (month == SEPTEMBER)
+        {
+            monthName = "September";
+        }
+        else if (month == OCTOBER)
+        {
+            monthName = "October";
+        }
+        else if (month == NOVEMBER)
+        {
+            monthName = "November";
+        }
+        else
+        {
+            monthName = "December";
+        }
+
+        return monthName;
+    }
 }
