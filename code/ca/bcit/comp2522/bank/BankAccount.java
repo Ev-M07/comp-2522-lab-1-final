@@ -13,11 +13,11 @@ public class BankAccount
     private static final int MAX_ACCOUNT_NUMBER_LENGTH;
 
     private final BankClient client;
-    private double          balanceUsd;
-    private final int       pin;
-    private final String    accountNumber;
-    private final Date      accountOpened;
-    private final Date      accountClosed;
+    private double           balanceUsd;
+    private final int        pin;
+    private final String     accountNumber;
+    private final Date       accountOpened;
+    private final Date       accountClosed;
 
     static
     {
@@ -31,7 +31,7 @@ public class BankAccount
      * @param client        the owner of the account
      * @param balanceUsd    the starting balance in USD
      * @param pin           the account PIN
-     * @param accountNumber the six or seven character account number
+     * @param accountNumber account number
      * @param accountOpened the date the account opened
      * @param accountClosed the closing date, or null if still open
      *
@@ -60,8 +60,8 @@ public class BankAccount
 
     /**
      * Validate Bank client.
+     *
      * @param client client to validate
-     * @return       client if valid
      */
     private static void validateClient(final BankClient client)
     {
@@ -74,25 +74,26 @@ public class BankAccount
 
     /**
      * Validate balance in USD.
+     *
      * @param balanceUsd balanceUsd to validate
-     * @return           balanceUsd if valid
      */
     private static void validateBalanceUsd(final double balanceUsd)
     {
-        final int zeroBalance;
-        zeroBalance = 0;
+        final int minBalanceUSD;
+        minBalanceUSD = 1000;
 
-        if (balanceUsd < zeroBalance)
+        if (balanceUsd < minBalanceUSD)
         {
             throw new IllegalArgumentException(
-                    "Balance cannot be negative.");
+                    "Balance cannot be less than " + minBalanceUSD + " USD");
         }
     }
 
     /**
      * Validate account number.
-     * @param accountNumber account number to validate
-     * @return           account number if valid
+     *
+     * @param accountNumber the MIN_ACCOUNT_NUMBER_LENGTH or MAX_ACCOUNT_NUMBER_LENGTH
+     *                     character account number to validate
      */
     private static void validateAccountNumber(final String accountNumber)
     {
@@ -111,6 +112,12 @@ public class BankAccount
         }
     }
 
+
+    /**
+     * Validate the date an account was opened.
+     *
+     * @param accountOpened account opened
+     */
     private static void validateAccountOpened(final Date accountOpened)
     {
         if (accountOpened == null)
@@ -129,7 +136,10 @@ public class BankAccount
      */
     public void deposit(final double amountUsd)
     {
-        if (amountUsd <= 0)
+        final int minBalanceUsd;
+        minBalanceUsd = 0;
+
+        if (amountUsd <= minBalanceUsd)
         {
             throw new IllegalArgumentException(
                     "Deposit amount must be positive.");
@@ -181,10 +191,13 @@ public class BankAccount
      */
     private void validateWithdrawal(final double amountUsd)
     {
-        if (amountUsd <= 0)
+        final int minBalanceUsd;
+        minBalanceUsd = 10000;
+
+        if (amountUsd <= minBalanceUsd)
         {
             throw new IllegalArgumentException(
-                    "Withdrawal amount must be positive.");
+                    "Withdrawal amount must be above " + minBalanceUsd);
         }
 
         if (amountUsd > balanceUsd)

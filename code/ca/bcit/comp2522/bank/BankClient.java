@@ -28,10 +28,10 @@ public class BankClient
      * Constructs a bank client.
      *
      * @param name       the client's name
-     * @param birthDate  the client's birth date
+     * @param birthDate  the client's birthdate
      * @param deathDate  the client's death date, or null if alive
      * @param signupDate the date the client joined the bank
-     * @param clientID   the client's six or seven character ID
+     * @param clientID   the client's MIN_ID_LENGTH  or MAX_ID_LENGTH character ID
      *
      * @throws IllegalArgumentException if required data is invalid
      */
@@ -90,9 +90,9 @@ public class BankClient
     }
 
     /**
-     * Returns the client's birth date.
+     * Returns the client's birthdate.
      *
-     * @return the birth date
+     * @return the birthdate
      */
     public Date getBirthDate()
     {
