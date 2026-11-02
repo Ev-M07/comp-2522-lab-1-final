@@ -45,11 +45,16 @@ public class BankAccount
                        final Date       accountClosed)
     {
 
-        this.client        = validateClient(client);
-        this.balanceUsd    = validateBalanceUsd(balanceUsd);
+        validateClient(client);
+        validateBalanceUsd(balanceUsd);
+        validateAccountNumber(accountNumber);
+        validateAccountOpened(accountOpened);
+
+        this.client        = client;
+        this.balanceUsd    = balanceUsd;
         this.pin           = pin;
-        this.accountNumber = validateAccountNumber(accountNumber);
-        this.accountOpened = validateAccountOpened(accountOpened);
+        this.accountNumber = accountNumber;
+        this.accountOpened = accountOpened;
         this.accountClosed = accountClosed;
     }
 
@@ -58,15 +63,13 @@ public class BankAccount
      * @param client client to validate
      * @return       client if valid
      */
-    private static BankClient validateClient(final BankClient client)
+    private static void validateClient(final BankClient client)
     {
         if (client == null)
         {
             throw new IllegalArgumentException(
                     "Client cannot be null.");
         }
-
-        return client;
     }
 
     /**
@@ -74,7 +77,7 @@ public class BankAccount
      * @param balanceUsd balanceUsd to validate
      * @return           balanceUsd if valid
      */
-    private static double validateBalanceUsd(final double balanceUsd)
+    private static void validateBalanceUsd(final double balanceUsd)
     {
         final int zeroBalance;
         zeroBalance = 0;
@@ -84,8 +87,6 @@ public class BankAccount
             throw new IllegalArgumentException(
                     "Balance cannot be negative.");
         }
-
-        return balanceUsd;
     }
 
     /**
@@ -93,7 +94,7 @@ public class BankAccount
      * @param accountNumber account number to validate
      * @return           account number if valid
      */
-    private static String validateAccountNumber(final String accountNumber)
+    private static void validateAccountNumber(final String accountNumber)
     {
         if (accountNumber == null)
         {
@@ -108,19 +109,15 @@ public class BankAccount
                     "Account number must contain {@link #MIN_ACCOUNT_NUMBER_LENGTH} " +
                             "or {@link #MAX_ACCOUNT_NUMBER_LENGTH} characters.");
         }
-
-        return accountNumber;
     }
 
-    private static Date validateAccountOpened(final Date accountOpened)
+    private static void validateAccountOpened(final Date accountOpened)
     {
         if (accountOpened == null)
         {
             throw new IllegalArgumentException(
                     "Account opening date cannot be null.");
         }
-
-        return accountOpened;
     }
 
     /**

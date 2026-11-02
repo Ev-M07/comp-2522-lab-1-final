@@ -72,7 +72,7 @@ public class BankClient
                     "Client ID must contain {@link #MIN_ID_LENGTH} to {@link #MAX_ID_LENGTH} characters.");
         }
 
-        this.name = name;
+        this.name       = name;
         this.birthDate  = birthDate;
         this.deathDate  = deathDate;
         this.signupDate = signupDate;
